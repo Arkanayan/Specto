@@ -59,7 +59,7 @@ def generate_spec(filename):
     #plt.plot(range(len(data)),data)
     plt.specgram(trimmed_data, NFFT=256, Fs=rate)
     output_filepath = "specs/" + filename + ".png"
-    plt.savefig(output_filepath))
+    plt.savefig(output_filepath)
     # except Exception as identifier:
     #     print("Exception occurred.")
     # remove the wav file
