@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, flash, redirect
+from flask import Flask, request, render_template, flash, redirect, send_file, abort
 from werkzeug.utils import secure_filename
 import os
 
@@ -11,6 +11,10 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def is_mp3(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() == 'mp3'
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -29,24 +33,41 @@ def index():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # if is_mp3(file):
+            #     file = convert_mp3_to_wav(file)
             # File is accepted
-            generate_spec(file)
-            return redirect(request.url)
+            spec_img = generate_spec(file.filename)
+            return render_template('index.html', spec_img=spec_img)
     
     return render_template('index.html')
 
-def generate_spec(file):
+@app.route('/specs/<image>')
+def specs_img(image):
+    try:
+       return send_file('specs/' + image)
+    except:
+        abort(404)
+
+def generate_spec(filename):
     from scipy.io import wavfile
     import matplotlib.pyplot as plt
     import numpy as np
    # try:
-    rate, data = wavfile.read("uploads/" + file.filename)
+    rate, data = wavfile.read("uploads/" + filename)
     trimmed_data = data.flatten()
     #plt.plot(range(len(data)),data)
     plt.specgram(trimmed_data, NFFT=256, Fs=rate)
-    plt.savefig(file.filename + ".png")
+    plt.savefig("specs/" + filename + ".png")
     # except Exception as identifier:
     #     print("Exception occurred.")
+    return filename + ".png"
 
+def convert_mp3_to_wav(file):
+    import pydub
+    sound = pydub.AudioSegment.from_mp3("uploads/" + file.filename)
+    output_filename = "uploads/" + file.filename + ".wav"
+    if sound.export(output_filename, format="wav"):
+        return output_filename
+    
 if __name__ == "__main__":
     app.run(debug=True)
