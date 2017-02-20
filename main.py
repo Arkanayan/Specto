@@ -40,10 +40,10 @@ def generate_spec(file):
     import matplotlib.pyplot as plt
     import numpy as np
    # try:
-    rate, data = wavfile.read(file.filename)
-    trimmed_data = np.trim_zeros(data.flatten())
+    rate, data = wavfile.read("uploads/" + file.filename)
+    trimmed_data = data.flatten()
     #plt.plot(range(len(data)),data)
-    plt.specgram(trimmed_data, NFFT=512, Fs=rate)
+    plt.specgram(trimmed_data, NFFT=256, Fs=rate)
     plt.savefig(file.filename + ".png")
     # except Exception as identifier:
     #     print("Exception occurred.")
