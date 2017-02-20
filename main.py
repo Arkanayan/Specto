@@ -4,6 +4,7 @@ import os
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['wav'])
+SPECS_FOLDER = 'specs'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -57,9 +58,12 @@ def generate_spec(filename):
     trimmed_data = data.flatten()
     #plt.plot(range(len(data)),data)
     plt.specgram(trimmed_data, NFFT=256, Fs=rate)
-    plt.savefig("specs/" + filename + ".png")
+    output_filepath = "specs/" + filename + ".png"
+    plt.savefig(output_filepath))
     # except Exception as identifier:
     #     print("Exception occurred.")
+    # remove the wav file
+    os.remove(UPLOAD_FOLDER + "/" + filename)
     return filename + ".png"
 
 def convert_mp3_to_wav(file):
