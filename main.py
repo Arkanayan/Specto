@@ -73,5 +73,3 @@ def convert_mp3_to_wav(file):
     if sound.export(output_filename, format="wav"):
         return output_filename
     
-if __name__ == "__main__":
-    app.run(debug=True)
